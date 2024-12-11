@@ -43,7 +43,7 @@
 	var/turf/fortifying = null
 	var/turf/protecting = null
 	var/destroy_level = 0
-	var/list/consider_destroy = list(/obj/reagent_dispensers = 1, /obj/table = 1, /obj/machinery/computer3 = 1, /obj/machinery/computer = 1, /obj/storage/secure/closet = 1, /obj/storage/closet = 1, /obj/machinery/door/airlock = 2, /obj/window = 2, /obj/grille = 2)
+	var/list/consider_destroy = list(/obj/reagent_dispensers = 1, /obj/table = 1, /obj/machinery/computer3 = 1, /obj/machinery/computer = 1, /obj/storage/secure/closet = 1, /obj/storage/closet = 1, /obj/machinery/door/airlock = 2, /obj/window = 2, /obj/mesh/grille = 2)
 
 	var/list/closed = list()
 
@@ -54,7 +54,7 @@
 		src.next_id++
 		state = STATE_DEPLOYING
 		..()
-		name = "Blob AI #[ai_id]"
+		name = "blob AI #[ai_id]"
 		real_name = name
 		deploy = locate(/datum/blob_ability/plant_nucleus) in abilities
 
@@ -318,8 +318,8 @@
 						return
 
 					color = random_color()
-					my_material.color = color
-					initial_material.color = color
+					my_material.setColor(color)
+					initial_material.setColor(color)
 					var/r = hex2num(copytext(color, 2, 4))
 					var/g = hex2num(copytext(color, 4, 6))
 					var/b = hex2num(copytext(color, 6))
@@ -361,9 +361,9 @@
 					counter = 0
 			if (STATE_EXPANDING)
 				refresh_lists++
-				if (blobs.len > 15 && prob(blobs.len / (ribosome_count + 1)) && bio_points_max >= ribosome.bio_point_cost)
+				if (length(blobs) > 15 && prob(blobs.len / (ribosome_count + 1)) && bio_points_max >= ribosome.bio_point_cost)
 					state = STATE_DO_LIPIDS
-				
+
 				src.do_upgrade()
 
 				if(length(open) + length(open_low) + length(open_medium) == 0 && length(closed) > 0)

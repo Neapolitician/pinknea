@@ -1,12 +1,28 @@
 
-/obj/effects/tatara
+/obj/effects/little_sparks
 	var/obj/spark_generator/sparks = new/obj/spark_generator
 
 	New()
 		..()
-		sparks.mouse_opacity = 0
-		vis_contents += sparks
-		sparks.particles.spawning = 0
+		src.sparks.mouse_opacity = 0
+		vis_contents += src.sparks
+
+/obj/effects/little_sparks/lit
+	New()
+		..()
+		src.add_simple_light("spark_light", list(0.94 * 255, 0.94 * 255, 0.94 * 255, 0.7 * 255))
+		animate(simple_light, alpha=(0.5*255), loop=-1, time=6)
+		animate(alpha=(0.3*255), time=3, easing=ELASTIC_EASING)
+		animate(alpha=(0.7*255), time=3, easing=CUBIC_EASING)
+		animate(time=7)
+		animate(alpha=(0.5*255), time=3, easing=ELASTIC_EASING)
+		animate(alpha=(0.7*255), time=3, easing=CUBIC_EASING)
+
+
+/obj/effects/little_sparks/tatara
+	New()
+		..()
+		src.sparks.particles.spawning = 0
 
 	proc/spark_up()
 		if(!ON_COOLDOWN(src,"spark_up",2 SECONDS))
@@ -241,3 +257,12 @@
 	// Takes x and y of a normalised vector to set direction of smoke.
 	proc/setdir(var/dir_x, var/dir_y)
 		particles.velocity = generator("box", list(50*dir_x - 0.5, 50*dir_y - 0.5, 0), list(40*dir_x + 0.5, 40*dir_y + 0.5, 0), UNIFORM_RAND)
+
+/particles/sprinkle
+	color = "#3399ff"
+	spawning = 3
+	count = 30
+	lifespan = 4.5
+	position = generator("box", list(-6,-5,0), list(6,20,0), UNIFORM_RAND)
+	gravity = list(0, -1, 0)
+	scale = list(1.5, 1.5)

@@ -4,8 +4,7 @@
 			set category = "Commands"
 			set name = "Changelog"
 			set desc = "Show or hide the changelog"
-
-			if (winget(src, "changes", "is-visible") == "true")
+			if (winexists(src, "changes") && winget(src, "changes", "is-visible") == "true")
 				src.Browse(null, "window=changes")
 			else
 				var/changelogHtml = grabResource("html/changelog.html")
@@ -71,10 +70,7 @@
 			set name = "Map"
 			set desc = "Open an interactive map in your browser"
 			set hidden = 1
-			if (map_settings)
-				src << link(map_settings.goonhub_map)
-			else
-				src << link("http://goonhub.com/maps/cogmap")
+			src << link(generate_ingame_map_link(src))
 
 		forum()
 			set category = "Commands"
@@ -86,3 +82,15 @@
 	proc
 		set_macro(name)
 			winset(src, "mainwindow", "macro=\"[name]\"")
+
+/proc/generate_ingame_map_link(client/our_user)
+	. = "/maps/cogmap"
+	if (map_settings)
+		. = map_settings.goonhub_map
+	. = goonhub_href(.)
+	var/turf/T = get_turf(our_user.mob)
+	if (!T || T.z != Z_LEVEL_STATION && T.z != Z_LEVEL_DEBRIS) //no maps for weird z levels or nullspace
+		return .
+	. += "?sx=[T.x]&sy=[T.y]&zoom=0"
+	if (T.z == Z_LEVEL_DEBRIS)
+		. += "&layer=debris"

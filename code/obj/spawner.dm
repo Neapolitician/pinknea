@@ -258,7 +258,7 @@
 				for(var/atom/A in T)
 					if(isliving(A))
 						affected_mobs.Add(A)
-					if(istype(A, /obj/window) || istype(A, /obj/grille))
+					if(istype(A, /obj/window) || istype(A, /obj/mesh/grille))
 						affected_objs.Add(A)
 					if(istype(A, /obj/blob))
 						affected_objs.Add(A)
@@ -292,3 +292,29 @@
 			for(var/atom/movable/overlay/A in (boom + boom_tips))
 				A.dispose()
 			src.dispose()
+
+
+
+/obj/spawner/mail
+	name = "mail spawner"
+	icon = 'icons/obj/items/items.dmi'
+	icon_state = "mail-1"
+	var/amount_to_make = 1
+
+	New()
+		..()
+		create_random_mail(src.loc, src.amount_to_make)
+		qdel(src)
+
+	two
+		name = "mail spawner (x2)"
+		amount_to_make = 2
+	five
+		name = "mail spawner (x5)"
+		amount_to_make = 5
+	ten
+		name = "mail spawner (x10)"
+		amount_to_make = 10
+	fifty
+		name = "mail spawner (x50)"
+		amount_to_make = 50

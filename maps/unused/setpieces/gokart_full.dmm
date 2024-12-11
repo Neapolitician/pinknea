@@ -830,7 +830,7 @@
 /turf/unsimulated/wall/other,
 /area/tdome/tdome1)
 "cf" = (
-/obj/grille/steel,
+/obj/mesh/grille/steel,
 /obj/window{
 	icon_state = "rwindow";
 	reinf = 1
@@ -863,7 +863,7 @@
 /turf/unsimulated/wall/other,
 /area/farm/bball)
 "ci" = (
-/obj/grille/steel,
+/obj/mesh/grille/steel,
 /obj/window{
 	icon_state = "rwindow";
 	reinf = 1
@@ -889,7 +889,7 @@
 /turf/unsimulated/wall/other,
 /area/tdome/tdome2)
 "ck" = (
-/obj/grille/steel,
+/obj/mesh/grille/steel,
 /obj/window{
 	icon_state = "rwindow";
 	reinf = 1
@@ -1359,7 +1359,7 @@
 	name = "Thunderdome Lounge"
 	})
 "dG" = (
-/obj/grille/steel,
+/obj/mesh/grille/steel,
 /obj/window{
 	icon_state = "rwindow";
 	dir = 8;
@@ -1389,7 +1389,7 @@
 	name = "Thunderdome Lounge"
 	})
 "dH" = (
-/obj/grille/steel,
+/obj/mesh/grille/steel,
 /obj/window{
 	icon_state = "rwindow";
 	reinf = 1
@@ -1414,7 +1414,7 @@
 	name = "Thunderdome Lounge"
 	})
 "dI" = (
-/obj/grille/steel,
+/obj/mesh/grille/steel,
 /obj/window{
 	icon_state = "rwindow";
 	dir = 4;
@@ -1634,7 +1634,7 @@
 	density = 1;
 	name = "blocker (thunderdome)"
 	},
-/obj/grille/steel,
+/obj/mesh/grille/steel,
 /obj/window{
 	icon_state = "rwindow";
 	dir = 10;
@@ -1753,7 +1753,7 @@
 	name = "Thunderdome Lounge"
 	})
 "en" = (
-/obj/critter/boogiebot,
+/mob/living/critter/small_animal/boogiebot,
 /turf/unsimulated/floor{
 	icon_state = "carpetS"
 	},
@@ -2356,7 +2356,7 @@
 /area/sim/area2)
 "ft" = (
 /obj/table/woodentable,
-/obj/item/spacecash/hundred,
+/obj/item/currency/spacecash/hundred,
 /turf/unsimulated/floor{
 	icon_state = "carpetS"
 	},
@@ -2508,7 +2508,7 @@
 	icon_state = "tabledir";
 	dir = 9
 	},
-/obj/item/spacecash/hundred,
+/obj/item/currency/spacecash/hundred,
 /turf/unsimulated/floor{
 	icon = 'racing.dmi';
 	icon_state = "track_1"
@@ -2519,9 +2519,9 @@
 	dir = 5;
 	icon_state = "tabledir"
 	},
-/obj/item/spacecash/twenty,
-/obj/item/spacecash/twenty,
-/obj/item/spacecash/twenty,
+/obj/item/currency/spacecash/twenty,
+/obj/item/currency/spacecash/twenty,
+/obj/item/currency/spacecash/twenty,
 /turf/unsimulated/floor{
 	icon = 'racing.dmi';
 	icon_state = "track_1"
@@ -2560,7 +2560,7 @@
 	icon_state = "tabledir";
 	dir = 6
 	},
-/obj/item/spacecash/hundred,
+/obj/item/currency/spacecash/hundred,
 /turf/unsimulated/floor{
 	icon = 'racing.dmi';
 	icon_state = "track_1"

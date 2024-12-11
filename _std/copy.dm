@@ -1,4 +1,6 @@
 /// makes a sorta deep copy of a thing
+/// VERY DANGEROUS AND PRONE TO CAUSE IMPOSSIBLE TO DEBUG ISSUES, USE ONLY WITH EXTREME CAUTION AND IN CONTROLLED ENVIRONMENTS
+/// Seriously, don't use this, just make a copy proc!
 #define SEMI_DEEP_COPY(x) ((isnum(x) || istext(x) || isnull(x) || isclient(x) || isicon(x) || isfile(x) || ispath(x)) ? (x) : semi_deep_copy(x))
 
 // copy flags
@@ -23,7 +25,7 @@ proc/semi_deep_copy(orig, new_arg=null, list/environment=null, root=null, copy_f
 			istype(orig, /datum/packet_network))
 		return orig
 	if(copy_flags & COPY_SKIP_EXPLOITABLE && (
-			istype(orig, /obj/item/uplink) || istype(orig, /obj/item/spacebux) || istype(orig, /obj/item/chem_hint) || istype(orig, /obj/item/pixel_pass)))
+			istype(orig, /obj/item/uplink) || istype(orig, /obj/item/currency/spacebux) || istype(orig, /obj/item/chem_hint) || istype(orig, /obj/item/pixel_pass)))
 		return null
 	if(isnull(environment))
 		root = orig

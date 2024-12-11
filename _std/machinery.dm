@@ -48,6 +48,10 @@
 #define PROCESSING_TIER_MULTI(target) (1<<(target.current_processing_tier-1)) //! Scalar to behave as if it were running at full speed
 #define MACHINE_PROCS_PER_SEC (MACHINE_PROC_INTERVAL / (1 SECOND))
 
+// Previous SOLARGENRATE was 1500 WATTS processed every 3.3 SECONDS.  This provides 455 WATTS every second
+// Adjust accordingly based on machine proc rate
+#define DEFAULT_SOLARGENRATE (455 * MACHINE_PROCS_PER_SEC)
+
 #define PROCESSING_FULL      1
 #define PROCESSING_HALF      2
 #define PROCESSING_QUARTER   3
@@ -74,11 +78,14 @@
 #define MACHINES_PORTALGENERATORS	15 // /obj/machinery/teleport/portal_generator
 #define MACHINES_MASSDRIVERS			16 // /obj/machinery/mass_driver
 #define MACHINES_MAINFRAMES				17 // /obj/machinery/networked/mainframe
-#define MACHINES_ELEVATORCOMPS		18 // /obj/machinery/computer/sea_elevator, /obj/machinery/computer/icebase_elevator, /obj/machinery/computer/biodome_elevator
+#define MACHINES_ELEVATORSEA		18 // /obj/machinery/computer/elevator/sea
 #define MACHINES_SHUTTLECOMPS			19 // /obj/machinery/computer/mining_shuttle, /obj/machinery/computer/research_shuttle, /obj/machinery/computer/prison_shuttle, /obj/machinery/computer/shuttle_bus
 #define MACHINES_SHUTTLEPROPULSION 20 // /obj/machinery/shuttle/engine/propulsion
 #define MACHINES_TURRETS					21	// /obj/machinery/turret
 #define MACHINES_DRONERECHARGERS	22	// /obj/machinery/drone_recharger
+#define MACHINES_ELEVATORICEBASE		23 // /obj/machinery/computer/elevator/icebase
+#define MACHINES_ELEVATORBIODOME		24 // /obj/machinery/computer/elevator/biodome
+#define MACHINES_ELEVATORCENTCOM		25 // /obj/machinery/computer/elevator/centcomm
 
 // misc objects that get looped for that have relatively few instances and the loops are not performance critical: /obj/machinery/tripod, /obj/machinery/compressor, /obj/machinery/noise_maker, /obj/machinery/engine_laser_spawner
 #define MACHINES_MISC							23

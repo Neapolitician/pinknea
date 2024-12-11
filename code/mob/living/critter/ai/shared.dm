@@ -7,7 +7,7 @@
 // responsible for: selecting a target (and reporting back the evaluation score based on its value)
 // and moving through the following two tasks:
 // moving to a selected target, performing a /datum/action on the selected target
-/datum/aiTask/sequence/goalbased/
+/datum/aiTask/sequence/goalbased
 	name = "goal parent"
 
 /datum/aiTask/sequence/goalbased/New(parentHolder, transTask)
@@ -26,7 +26,8 @@
 
 /datum/aiTask/sequence/goalbased/proc/precondition()
 	// useful for goals that have a requirement, return 0 to instantly make this state score 0 and not be picked
-	. = TRUE
+	if(src.holder)
+		. = TRUE
 
 /datum/aiTask/sequence/goalbased/on_tick()
 	..()
@@ -36,8 +37,31 @@
 		// make sure we both set our target and move to our target correctly
 		var/datum/aiTask/succeedable/move/M = subtasks[subtask_index]
 		if(M && !M.move_target)
-			M.can_be_adjacent_to_target = src.can_be_adjacent_to_target
+			M.distance_from_target = src.distance_from_target
 			M.move_target = holder.target
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SITTING TASK
+// have a little sit down
+/datum/aiTask/timed/sitting
+	name = "sitting"
+	minimum_task_ticks = 5
+	maximum_task_ticks = 10
+
+/datum/aiTask/timed/sitting/evaluate()
+	. = 0
+	if(!GET_COOLDOWN(src.holder.owner, "sit_down"))
+		return 1
+
+/datum/aiTask/timed/sitting/on_tick()
+	ON_COOLDOWN(src.holder.owner, "sit_down", 15 SECONDS)
+	holder.stop_move()
+	holder.owner.icon_state = "[initial(holder.owner.icon_state)]-sit"
+
+/datum/aiTask/timed/sitting/next_task()
+	. = ..()
+	if(.)
+		holder.owner.icon_state = initial(holder.owner.icon_state)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WANDER TASK
@@ -57,6 +81,10 @@
 	holder.owner.process_move()
 	holder?.stop_move() // Just in case they yeet themselves out of existance
 	holder?.owner.move_dir = null // clear out direction so it doesn't get latched when client is attached
+
+/datum/aiTask/timed/wander/short
+	minimum_task_ticks = 1
+	maximum_task_ticks = 3
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TARGETED TASK
@@ -84,13 +112,13 @@
 	if(QDELETED(src.move_target))
 		fails++
 		return
-	if(length(holder.target_path) && GET_DIST(holder.target_path[length(holder.target_path)], move_target) <= can_be_adjacent_to_target)
+	if(length(holder.target_path) && GET_DIST(holder.target_path[length(holder.target_path)], move_target) <= distance_from_target)
 		src.found_path = holder.target_path
 	else
-		src.found_path = get_path_to(holder.owner, move_target, src.max_path_dist, can_be_adjacent_to_target, null, !move_through_space)
-		if(GET_DIST(get_turf(holder.target), move_target) <= can_be_adjacent_to_target)
+		src.found_path = get_path_to(holder.owner, move_target, max_distance=src.max_path_dist, mintargetdist=distance_from_target, simulated_only=!move_through_space)
+		if(GET_DIST(get_turf(holder.target), move_target) <= distance_from_target)
 			holder.target_path = src.found_path
-	if(!src.found_path) // no path :C
+	if(!src.found_path || !jpsTurfPassable(src.found_path[1], get_turf(src.holder.owner), src.holder.owner)) // no path :C
 		fails++
 
 /datum/aiTask/succeedable/move/on_reset()
@@ -109,13 +137,13 @@
 
 /datum/aiTask/succeedable/move/succeeded()
 	if(move_target)
-		. = (GET_DIST(holder.owner, src.move_target) <= can_be_adjacent_to_target)
+		. = (GET_DIST(holder.owner, src.move_target) <= distance_from_target)
 		if(.)
 			holder.stop_move()
 		return
 
 /datum/aiTask/succeedable/move/failed()
-	if(!move_target || !src.found_path)
+	if(QDELETED(move_target) || !src.found_path)
 		fails++
 	return fails >= max_fails
 
@@ -229,3 +257,45 @@
 	..()
 	holder.target = null
 	holder.stop_move()
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERIC ACTION BAR TASK
+// Use this when you want to an action bar, then wait for it to complete or be interupted before continuing
+// Interupt counts as a fail.
+// Set the final action you want to happen in `callback_proc`. It will recieve the owner and the target as arguments.
+// You can also define a `before_action_start()` proc on the aitask to do something before the action is started
+/datum/aiTask/succeedable/actionbar
+	var/datum/action/bar/icon/callback/actionbar
+	// action bar duration in deciseconds
+	var/duration = 5 SECONDS
+	// The proc to run when the action completes. PROC_REF(callback) where callback is a proc on the aitask
+	var/callback_proc = null
+	// The icon to display above the actionbar
+	var/action_icon = null
+	// The iconstate for the icon above the actionbar
+	var/action_icon_state = null
+	// a message displayed to all mobs that can see the owner at the end of the task (e.g. "the [holder.owner] does the thing to [holder.target]")
+	var/end_message = null
+	// flags which indicate what actions should interupt the actionbar
+	var/interrupt_flags = INTERRUPT_MOVE | INTERRUPT_STUNNED | INTERRUPT_ACTION
+	// internal flag for having started
+	var/_has_started = FALSE
+
+/datum/aiTask/succeedable/actionbar/on_reset()
+	QDEL_NULL(src.actionbar)
+	_has_started = FALSE
+
+/datum/aiTask/succeedable/actionbar/on_tick()
+	if(!istype(actionbar))
+		src.before_action_start()
+		actionbar = SETUP_GENERIC_ACTIONBAR(src.holder.owner, src.holder.target, src.duration, src.callback_proc, list(src.holder.owner, src.holder.target), src.action_icon, src.action_icon_state, src.end_message, src.interrupt_flags)
+		actionbar.call_proc_on = src
+		_has_started = TRUE
+
+/datum/aiTask/succeedable/actionbar/proc/before_action_start()
+
+/datum/aiTask/succeedable/actionbar/succeeded()
+	return (_has_started && QDELETED(actionbar)) || (istype(actionbar) && actionbar.state == ACTIONSTATE_DELETE && actionbar.interrupt_start == -1)
+
+/datum/aiTask/succeedable/actionbar/failed()
+	return (istype(actionbar) && actionbar.state == ACTIONSTATE_DELETE && actionbar.interrupt_start > -1)

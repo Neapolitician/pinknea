@@ -15,6 +15,11 @@
 	var/list/packet_data = list()
 	var/max_logs = 8
 
+	New()
+		..()
+		if (global.current_state < GAME_STATE_PLAYING)
+			new /obj/item/paper/packets(src.loc)
+
 	attack_ai(mob/user as mob)
 		if(mode)
 			src.interacted(user)
@@ -46,7 +51,7 @@
 
 					else
 
-						boutput(user, "<span class='alert'>The [src] couldn't be attached here!</span>")
+						boutput(user, SPAN_ALERT("The [src] couldn't be attached here!"))
 						return
 
 				else
@@ -157,7 +162,7 @@
 			newdat += "<br>Included file ([strip_html(signal.data_file.name)], [strip_html(signal.data_file.extension)]): [. ? . : "Not printable."]"
 
 		src.packet_data += newdat
-		if (src.packet_data.len > src.max_logs)
+		if (length(src.packet_data) > src.max_logs)
 			src.packet_data.Cut(1,2)
 		src.last_intercept = world.time
 		src.updateIntDialog()

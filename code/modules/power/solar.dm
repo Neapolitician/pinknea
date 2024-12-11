@@ -10,8 +10,8 @@
 //As long as this is working, solar panels on same powernet will track automatically
 
 TYPEINFO(/obj/machinery/power/tracker)
-	mats = list("CRY-1"=15, "CON-1"=20)
-
+	mats = list("crystal" = 15,
+				"conductive" = 20)
 /obj/machinery/power/tracker
 	name = "Houyi stellar tracker"
 	desc = "The XIANG|GIESEL model '后羿' star tracker, used to set the alignment of accompanying photo-electric generator panels."
@@ -84,8 +84,8 @@ TYPEINFO(/obj/machinery/power/tracker)
 /////////////////////////////////////////////// Solar panel /////////////////////////////////////////////////////
 
 TYPEINFO(/obj/machinery/power/solar)
-	mats = list("MET-2"=15, "CON-1"=15)
-
+	mats = list("metal_dense" = 15,
+				"conductive" = 15)
 /obj/machinery/power/solar
 	name = "Kuafu photoelectric panel"
 	desc = "The XIANG|GIESEL model '夸父' photo electrical generator. commonly known as a solar panel."
@@ -176,7 +176,7 @@ TYPEINFO(/obj/machinery/power/solar)
 	else
 		src.icon_state = "solar_panel"
 		src.set_dir(NORTH)
-		animate(src, time=rand(0.1 SECONDS, 9 SECONDS))
+		animate(src, time=randfloat(0.1 SECONDS, 9 SECONDS))
 		animate(transform=matrix(adir, MATRIX_ROTATE), time=rand(1 SECOND, 4 SECONDS))
 
 /obj/machinery/power/solar/proc/update_solar_exposure()
@@ -187,9 +187,6 @@ TYPEINFO(/obj/machinery/power/solar)
 	var/p_angle = (360 + adir - sun.angle) % 360
 	sunfrac = max(cos(p_angle), 0) ** 2
 
-// Previous SOLARGENRATE was 1500 WATTS processed every 3.3 SECONDS.  This provides 454.54 WATTS every second
-// Adjust accordingly based on machine proc rate
-#define SOLARGENRATE (454.54 * MACHINE_PROCS_PER_SEC)
 
 /obj/machinery/power/solar/process()
 	..()
@@ -197,7 +194,7 @@ TYPEINFO(/obj/machinery/power/solar)
 		return
 
 	if(!obscured)
-		var/sgen = SOLARGENRATE * sunfrac
+		var/sgen = global.solar_gen_rate * sunfrac
 		sgen *= PROCESSING_TIER_MULTI(src)
 		add_avail(sgen)
 		if(powernet && control && powernet == control.get_direct_powernet())
@@ -319,7 +316,7 @@ TYPEINFO(/obj/machinery/power/solar)
 
 	lastgen = gen
 	gen = 0
-	SEND_SIGNAL(src,COMSIG_MECHCOMP_TRANSMIT_SIGNAL, "power=[lastgen]&powerfmt=[engineering_notation(lastgen)]W&angle=[cdir]")
+	SEND_SIGNAL(src,COMSIG_MECHCOMP_TRANSMIT_SIGNAL, "power=[num2text(round(lastgen), 50)]&powerfmt=[engineering_notation(lastgen)]W&angle=[cdir]")
 
 	if(status & (NOPOWER | BROKEN))
 		return
@@ -471,7 +468,7 @@ TYPEINFO(/obj/machinery/power/solar/owl_cheat)
 		if(status & BROKEN)
 			return
 
-		var/sgen = SOLARGENRATE * sunfrac
+		var/sgen = DEFAULT_SOLARGENRATE * sunfrac
 		sgen *= PROCESSING_TIER_MULTI(src)
 		add_avail(sgen)
 		if(powernet && control)
